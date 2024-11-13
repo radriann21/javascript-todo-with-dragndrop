@@ -2,19 +2,62 @@ const addTaskButton = document.getElementById('add-task')
 const listTasks = document.getElementById('list-task')
 const formModal = document.getElementById('modal')
 const closeModalButton = document.getElementById('close-modal')
+const taskForm = document.getElementById('task-form')
+let tasks = []
 
 // open/close modal
 addTaskButton.addEventListener('click', () => {
   formModal.classList.remove('hidden')
 })
 
-closeModalButton.addEventListener('click', () => {
+closeModalButton.addEventListener('click', (evt) => {
+  evt.preventDefault()
   formModal.classList.add('hidden')
 })
 
+// function to create the HTML String element for every task
+function renderTask(task) {
+  const taskHTML = `
+     <li class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <input type="checkbox" name="completed" id="check-task">
+            <p class="inline text-sm text-gray-700">${task.name}</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <svg class="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="icon icon-tabler icons-tabler-outline icon-tabler-trash-x">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M4 7h16" />
+              <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+              <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+              <path d="M10 12l4 4m0 -4l-4 4" />
+            </svg>
+            <svg class="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+              <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+              <path d="M16 5l3 3" />
+            </svg>
+          </div>
+        </li>
+  `
+  return taskHTML
+}
+
+// function to map every task and make the render
+function mapTasks(tasks) {
+  listTasks.innerHTML = ''
+  tasks.forEach(task => {
+    listTasks.innerHTML += renderTask(task)
+  })
+}
+
+// function to initialize the localStorage and the tasks
 function initializeTasks() {
   const localStorageTasks = JSON.parse(localStorage.getItem('tasks'))
-  let tasks = []
 
   try {
     tasks = localStorageTasks || []
@@ -30,6 +73,28 @@ function initializeTasks() {
     })
     localStorage.setItem('tasks', JSON.stringify(tasks))
   }
+  mapTasks(tasks)
 }
 initializeTasks()
+
+// event to add a new task
+formModal.addEventListener('submit', (evt) => {
+  evt.preventDefault()
+
+  const taskName = formModal.querySelector('#task').value
+  if (!taskName || taskName === '') {
+    alert('error!')
+    return
+  }
+
+  const task = {
+    id: crypto.randomUUID(),
+    name: taskName,
+    completed: false
+  }
+
+  tasks.push(task)
+  localStorage.setItem('tasks', JSON.stringify(tasks))
+  mapTasks(tasks)
+})
 
