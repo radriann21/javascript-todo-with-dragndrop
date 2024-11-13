@@ -9,14 +9,34 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 
-<body class="max-w-full min-h-screen bg-blue-100">
+<body class="max-w-full min-h-screen bg-blue-100 relative">
+
+  <div id="modal"
+    class="hidden w-full min-h-screen absolute z-10 bg-slate-900 opacity-80 flex items-center justify-center flex-col transition-all duration-300">
+    <form class="w-[30%] h-[220px] rounded-md p-4 bg-white z-20 flex flex-col">
+      <h2 class="text-center font-bold my-4">Add your task</h2>
+      <label class="text-sm text-gray-700 font-bold" for="name">Task Name</label>
+      <input
+        class="w-[80%] mt-2 border-b-2 border-gray-700 border-opacity-25 focus:border-b-slate-800 focus:outline-none text-sm"
+        type="text" name="name" id="task" autocomplete="off" placeholder="Write your task...">
+
+      <div class="w-full flex items-center space-x-4">
+        <button
+          class="mt-4 w-32 p-2 rounded-lg text-center font-bold text-white bg-indigo-500 text-sm transition duration-300 hover:bg-indigo-600 hover:shadow-md cursor-pointer"
+          id="save-task">Save Task</button>
+        <button
+          class="mt-4 w-32 p-2 rounded-lg text-center font-bold text-white bg-indigo-500 text-sm transition duration-300 hover:bg-indigo-600 hover:shadow-md cursor-pointer"
+          id="close-modal">Close</button>
+      </div>
+    </form>
+  </div>
 
   <main class="w-full h-screen flex flex-col items-center justify-center space-y-6">
     <section class="w-[40%] bg-indigo-500 text-center text-white p-4 shadow-md">
       <h2 class="font-sans text-xl font-bold">ToDo List</h2>
     </section>
     <article class="w-[40%] bg-white shadow-md p-8 flex flex-col rounded-md relative">
-      <ul class="flex flex-col space-y-4 text-start">
+      <ul id="list-task" class="flex flex-col space-y-4 text-start">
         <li class="flex items-center justify-between">
           <div class="flex items-center space-x-2">
             <input type="checkbox" name="" id="">
@@ -43,7 +63,7 @@
           </div>
         </li>
       </ul>
-      <button
+      <button id="add-task"
         class="w-32 p-2 rounded-lg text-center font-bold text-white bg-indigo-500 text-sm absolute -bottom-4 left-[50%] -translate-x-[50%] transition duration-300 hover:bg-indigo-600 hover:shadow-md hover:scale-105 cursor-pointer">
         NewTask
       </button>
