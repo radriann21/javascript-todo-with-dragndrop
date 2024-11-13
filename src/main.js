@@ -12,4 +12,24 @@ closeModalButton.addEventListener('click', () => {
   formModal.classList.add('hidden')
 })
 
+function initializeTasks() {
+  const localStorageTasks = JSON.parse(localStorage.getItem('tasks'))
+  let tasks = []
+
+  try {
+    tasks = localStorageTasks || []
+  } catch (error) {
+    console.log(error)
+  }
+
+  if (tasks.length === 0) {
+    tasks.push({
+      id: 1,
+      name: 'Delete or edit this task',
+      completed: false
+    })
+    localStorage.setItem('tasks', JSON.stringify(tasks))
+  }
+}
+initializeTasks()
 
