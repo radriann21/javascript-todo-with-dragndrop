@@ -9,22 +9,32 @@ let tasks = []
 addTaskButton.addEventListener('click', () => {
   formModal.classList.remove('hidden')
 })
-
 closeModalButton.addEventListener('click', (evt) => {
   evt.preventDefault()
   formModal.classList.add('hidden')
 })
+// open/close modal
+
+
+// function to delete the task
+function deleteTask(evt) {
+  const taskId = evt.currentTarget.closest('li').getAttribute('data-id')
+  tasks = tasks.filter(task => task.id !== taskId)
+  localStorage.setItem('tasks', JSON.stringify(tasks))
+  mapTasks(tasks)
+}
+
 
 // function to create the HTML String element for every task
 function renderTask(task) {
   const taskHTML = `
-     <li class="flex items-center justify-between">
+     <li class="flex items-center justify-between" data-id="${task.id}" >
           <div class="flex items-center space-x-2">
-            <input type="checkbox" name="completed" id="check-task">
+            <input class="check-task" type="checkbox" name="completed">
             <p class="inline text-sm text-gray-700">${task.name}</p>
           </div>
           <div class="flex items-center space-x-2">
-            <svg class="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            <svg class="delete-button cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="icon icon-tabler icons-tabler-outline icon-tabler-trash-x">
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -47,13 +57,29 @@ function renderTask(task) {
   return taskHTML
 }
 
+
+
 // function to map every task and make the render
 function mapTasks(tasks) {
   listTasks.innerHTML = ''
   tasks.forEach(task => {
     listTasks.innerHTML += renderTask(task)
   })
+  // add delete action 
+  document.querySelectorAll('.delete-button').forEach(button => {
+    button.addEventListener('click', deleteTask)
+  })
+  // add completed action
+  document.querySelectorAll('.check-task').forEach(check => {
+    check.addEventListener('change', (evt) => {
+      if (check.checked) {
+        deleteTask(evt)
+      }
+    })
+  })
 }
+
+
 
 // function to initialize the localStorage and the tasks
 function initializeTasks() {
@@ -67,7 +93,7 @@ function initializeTasks() {
 
   if (tasks.length === 0) {
     tasks.push({
-      id: 1,
+      id: crypto.randomUUID(),
       name: 'Delete or edit this task',
       completed: false
     })
@@ -76,6 +102,8 @@ function initializeTasks() {
   mapTasks(tasks)
 }
 initializeTasks()
+
+
 
 // event to add a new task
 formModal.addEventListener('submit', (evt) => {
@@ -96,5 +124,7 @@ formModal.addEventListener('submit', (evt) => {
   tasks.push(task)
   localStorage.setItem('tasks', JSON.stringify(tasks))
   mapTasks(tasks)
+  formModal.classList.add('hidden')
 })
+
 
