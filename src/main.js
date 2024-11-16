@@ -4,14 +4,18 @@ const formModal = document.getElementById('modal')
 const closeModalButton = document.getElementById('close-modal')
 const taskForm = document.getElementById('task-form')
 let tasks = []
+let editingTask = null
 
 // open/close modal
 addTaskButton.addEventListener('click', () => {
+  formModal.querySelector('#task').value = ''
   formModal.classList.remove('hidden')
+  taskForm.focus()
 })
 closeModalButton.addEventListener('click', (evt) => {
   evt.preventDefault()
   formModal.classList.add('hidden')
+  formModal.querySelector('#task').value = ''
 })
 // open/close modal
 
@@ -22,6 +26,17 @@ function deleteTask(evt) {
   tasks = tasks.filter(task => task.id !== taskId)
   localStorage.setItem('tasks', JSON.stringify(tasks))
   mapTasks(tasks)
+}
+
+// function to get the task to edit
+function editTask(evt) {
+  formModal.classList.remove('hidden')
+  taskForm.focus()
+
+  const taskId = evt.currentTarget.closest('li').getAttribute('data-id')
+  const task = tasks.find(task => task.id === taskId)
+  editingTask = task
+  formModal.querySelector('#task').value = task.name
 }
 
 
@@ -43,7 +58,7 @@ function renderTask(task) {
               <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
               <path d="M10 12l4 4m0 -4l-4 4" />
             </svg>
-            <svg class="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            <svg class="edit-button cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -65,10 +80,17 @@ function mapTasks(tasks) {
   tasks.forEach(task => {
     listTasks.innerHTML += renderTask(task)
   })
+
   // add delete action 
   document.querySelectorAll('.delete-button').forEach(button => {
     button.addEventListener('click', deleteTask)
   })
+
+  // add edit action
+  document.querySelectorAll('.edit-button').forEach(button => {
+    button.addEventListener('click', editTask)
+  })
+
   // add completed action
   document.querySelectorAll('.check-task').forEach(check => {
     check.addEventListener('change', (evt) => {
@@ -110,21 +132,32 @@ formModal.addEventListener('submit', (evt) => {
   evt.preventDefault()
 
   const taskName = formModal.querySelector('#task').value
-  if (!taskName || taskName === '') {
-    alert('error!')
+
+  if (editingTask !== null) {
+    editingTask.name = taskName
+    localStorage.setItem('tasks', JSON.stringify(tasks))
+    mapTasks(tasks)
+    formModal.classList.add('hidden')
+    editingTask = null
     return
+  } else {
+    const task = {
+      id: crypto.randomUUID(),
+      name: taskName,
+      completed: false
+    }
+
+    if (task.name === '' || !task.name) {
+      return
+    }
+
+    tasks.push(task)
+    localStorage.setItem('tasks', JSON.stringify(tasks))
+    mapTasks(tasks)
+    formModal.classList.add('hidden')
   }
 
-  const task = {
-    id: crypto.randomUUID(),
-    name: taskName,
-    completed: false
-  }
-
-  tasks.push(task)
-  localStorage.setItem('tasks', JSON.stringify(tasks))
-  mapTasks(tasks)
-  formModal.classList.add('hidden')
+  formModal.querySelector('#task').value = ''
 })
 
 
